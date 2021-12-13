@@ -5,6 +5,82 @@ date: "12/11/2021"
 output: github_document
 ---
 
+
+# Chapter 2: Statistical Learning
+
+8.
+```{r}
+library(ISLR)
+summary(College)
+pairs(College[,2:6])
+boxplot(College$Outstate~College$Private)
+Elite<-rep("No",nrow(College))
+Elite[College$Top10perc>50]<-"Yes"
+Elite<-as.factor(Elite)
+College<-data.frame(College,Elite)
+summary(College$Elite)
+boxplot(College$Outstate~College$Elite)
+par(mfrow=c(2,2))
+hist(College$Room.Board,breaks=25)
+hist(College$Books,breaks=15)
+hist(College$Apps,breaks=50)
+hist(College$PhD,breaks=12)
+
+```
+  
+
+9.
+  The variables Name and Origin are qualitative and the rest are quantitative.
+  
+```{r}
+for (i in 1:7)
+{cat("The range of", names(Auto)[i],"is",range(Auto[,i]),"\n")}
+```
+  
+```{r}
+for (i in 1:7)
+{cat("The mean and standard deviation of",names(Auto)[i],"are",mean(Auto[,i]),"and",sd(Auto[,i]),"\n")}
+```
+ 
+10.
+   A. The first problem
+  
+  B. Second problem
+  
+  C. third problem
+  
+  D. The first problem
+  
+  E. Second problem
+  
+  F. third problem
+  
+  G. Second problem
+  
+  H. third problem
+
+# Chapter 3: Linear Regression
+
+# Chapter 4: Classification
+
+# Chapter 5: Resampling Methods
+
+# Chapter 6: Linear Model Selection and Regularisation
+
+# Chapter 7: Moving Beyond Linearity
+
+# Chapter 8: Tree Based Methods
+
+# Chapter 9: Support Vector Machines
+
+# Chapter 10: Deep Learning
+
+# Chapter 11: Survival Analysis and Censored Data
+
+# Chapter 12: Unsupervised Learning
+
+# Chapter 13: Multiple Testing
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```

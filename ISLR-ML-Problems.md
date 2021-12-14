@@ -201,10 +201,86 @@ pairs(Boston[,7:13])
 ``` r
 par(mfrow=c(3,4))
 for (i in 2:13)
-{plot(Boston$crim,Boston[,i],ylab=names(Boston[i]))}
+{plot(Boston$crim,Boston[,i],ylab=names(Boston)[i])}
 ```
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+None of the predictors seem to have a correlation with the per capita
+crime rate
+
+``` r
+par(mfrow=c(3,1))
+hist(Boston$crim,breaks=30)
+hist(Boston$tax,breaks=30)
+hist(Boston$ptratio,breaks=30)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+From the histograms it is clear to see that there is a small number of
+outliers that have very large crime rates. Similarly, there are a number
+of suburbs where property tax is appreacibly above all other suburbs.
+The pupil teacher ratio is reasonably uniform apart from one large peak
+just above 20.
+
+``` r
+cat("The number of suburbs bordering the Charles river is",sum(Boston$chas),"\n")
+```
+
+    ## The number of suburbs bordering the Charles river is 35
+
+``` r
+cat("The median pupil teacher ratio is",median(Boston$ptratio))
+```
+
+    ## The median pupil teacher ratio is 19.05
+
+``` r
+cat("The minimum median value of owner occupied homes is",min(Boston$medv),"and it occurs in the",which.min(Boston$medv),"suburb.\n")
+```
+
+    ## The minimum median value of owner occupied homes is 5 and it occurs in the 399 suburb.
+
+``` r
+medians<-rep(0,ncol(Boston))
+for (i in 1:ncol(Boston))
+{if (median(Boston[,i])==0)
+     {medians[i]=mean(Boston[,i])}
+else
+{medians[i]=median(Boston[,i])}
+cat("The",names(Boston)[i], "predictor value at this location is",round(Boston[which.min(Boston$medv),i]/medians[i],3),"times the median value of that predictor. \n")}
+```
+
+    ## The crim predictor value at this location is 149.514 times the median value of that predictor. 
+    ## The zn predictor value at this location is 0 times the median value of that predictor. 
+    ## The indus predictor value at this location is 1.868 times the median value of that predictor. 
+    ## The chas predictor value at this location is 0 times the median value of that predictor. 
+    ## The nox predictor value at this location is 1.288 times the median value of that predictor. 
+    ## The rm predictor value at this location is 0.878 times the median value of that predictor. 
+    ## The age predictor value at this location is 1.29 times the median value of that predictor. 
+    ## The dis predictor value at this location is 0.464 times the median value of that predictor. 
+    ## The rad predictor value at this location is 4.8 times the median value of that predictor. 
+    ## The tax predictor value at this location is 2.018 times the median value of that predictor. 
+    ## The ptratio predictor value at this location is 1.06 times the median value of that predictor. 
+    ## The lstat predictor value at this location is 2.693 times the median value of that predictor. 
+    ## The medv predictor value at this location is 0.236 times the median value of that predictor.
+
+``` r
+room7<-rep(0,nrow(Boston))
+room7[Boston$rm>7]=1
+cat("The number of suburbs that average more than 7 rooms per house is",sum(room7)," representing",round(sum(room7)/length(room7),3),"of suburbs  \n")
+```
+
+    ## The number of suburbs that average more than 7 rooms per house is 64  representing 0.126 of suburbs
+
+``` r
+room8<-rep(0,nrow(Boston))
+room8[Boston$rm>8]=1
+cat("The number of suburbs that average more than 8 rooms per house is",sum(room8)," representing",round(sum(room8)/length(room8),3),"of suburbs  \n")
+```
+
+    ## The number of suburbs that average more than 8 rooms per house is 13  representing 0.026 of suburbs
 
 # Chapter 3: Linear Regression
 
@@ -227,34 +303,3 @@ for (i in 2:13)
 # Chapter 12: Unsupervised Learning
 
 # Chapter 13: Multiple Testing
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
-
-``` r
-summary(cars)
-```
-
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
-
-## Including Plots
-
-You can also embed plots, for example:
-
-![](ISLR-ML-Problems_files/figure-gfm/pressure-1.png)<!-- -->
-
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.

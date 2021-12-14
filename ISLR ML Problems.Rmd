@@ -80,6 +80,39 @@ for (i in 2:13)
 
 None of the predictors seem to have a correlation with the per capita crime rate
 
+```{r}
+par(mfrow=c(3,1))
+hist(Boston$crim,breaks=30)
+hist(Boston$tax,breaks=30)
+hist(Boston$ptratio,breaks=30)
+```
+
+From the histograms it is clear to see that there is a small number of outliers that have very large crime rates. Similarly, there are a number of suburbs where property tax is appreacibly above all other suburbs. The pupil teacher ratio is reasonably uniform apart from one large peak just above 20. 
+
+```{r}
+cat("The number of suburbs bordering the Charles river is",sum(Boston$chas),"\n")
+
+cat("The median pupil teacher ratio is",median(Boston$ptratio))
+
+cat("The minimum median value of owner occupied homes is",min(Boston$medv),"and it occurs in the",which.min(Boston$medv),"suburb.\n")
+
+medians<-rep(0,ncol(Boston))
+for (i in 1:ncol(Boston))
+{if (median(Boston[,i])==0)
+     {medians[i]=mean(Boston[,i])}
+else
+{medians[i]=median(Boston[,i])}
+cat("The",names(Boston)[i], "predictor value at this location is",round(Boston[which.min(Boston$medv),i]/medians[i],3),"times the median value of that predictor. \n")}
+
+room7<-rep(0,nrow(Boston))
+room7[Boston$rm>7]=1
+cat("The number of suburbs that average more than 7 rooms per house is",sum(room7)," representing",round(sum(room7)/length(room7),3),"of suburbs  \n")
+
+room8<-rep(0,nrow(Boston))
+room8[Boston$rm>8]=1
+cat("The number of suburbs that average more than 8 rooms per house is",sum(room8)," representing",round(sum(room8)/length(room8),3),"of suburbs  \n")
+```
+
 # Chapter 3: Linear Regression
 
 # Chapter 4: Classification
@@ -102,26 +135,3 @@ None of the predictors seem to have a correlation with the per capita crime rate
 
 # Chapter 13: Multiple Testing
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

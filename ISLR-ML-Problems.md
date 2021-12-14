@@ -5,7 +5,7 @@ Robbie Mc Guinness
 
 # Chapter 2: Statistical Learning
 
-8.  
+### Question 8
 
 ``` r
 library(ISLR)
@@ -87,8 +87,10 @@ hist(College$PhD,breaks=12)
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-1-4.png)<!-- -->
 
-9.  The variables Name and Origin are qualitative and the rest are
-    quantitative.
+### Question 9
+
+The variables Name and Origin are qualitative and the rest are
+quantitative.
 
 ``` r
 for (i in 1:7)
@@ -116,7 +118,44 @@ for (i in 1:7)
     ## The mean and standard deviation of acceleration are 15.54133 and 2.758864 
     ## The mean and standard deviation of year are 75.97959 and 3.683737
 
-10. A. The first problem
+``` r
+Auto2<-Auto[-c(10:85),]
+for (i in 1:7)
+{cat("Having removed the 10th through 85th rows; the range of", names(Auto2)[i],"is",range(Auto2[,i]),"\n and the mean and standard deviation of",names(Auto2)[i],"are",mean(Auto2[,i]),"and",sd(Auto2[,i]),".\n")}
+```
+
+    ## Having removed the 10th through 85th rows; the range of mpg is 11 46.6 
+    ##  and the mean and standard deviation of mpg are 24.40443 and 7.867283 .
+    ## Having removed the 10th through 85th rows; the range of cylinders is 3 8 
+    ##  and the mean and standard deviation of cylinders are 5.373418 and 1.654179 .
+    ## Having removed the 10th through 85th rows; the range of displacement is 68 455 
+    ##  and the mean and standard deviation of displacement are 187.2405 and 99.67837 .
+    ## Having removed the 10th through 85th rows; the range of horsepower is 46 230 
+    ##  and the mean and standard deviation of horsepower are 100.7215 and 35.70885 .
+    ## Having removed the 10th through 85th rows; the range of weight is 1649 4997 
+    ##  and the mean and standard deviation of weight are 2935.972 and 811.3002 .
+    ## Having removed the 10th through 85th rows; the range of acceleration is 8.5 24.8 
+    ##  and the mean and standard deviation of acceleration are 15.7269 and 2.693721 .
+    ## Having removed the 10th through 85th rows; the range of year is 70 82 
+    ##  and the mean and standard deviation of year are 77.14557 and 3.106217 .
+
+``` r
+pairs(Auto[,1:7])
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+There appears to be strong positive linear relationships between
+horsepower and weight. Similarly, there is a positive approximately
+linear relationship between horsepower and displacement and between
+weight and displacement.
+
+The predictors displacement, weight and horsepower seem to be the ones
+with the most obvious relationship to mpg. Each exhibits a decreasing
+weakly non-linear relationship with mpg.
+
+### Question 10
+
+A. The first problem
 
 B. Second problem
 

@@ -144,6 +144,7 @@ pairs(Auto[,1:7])
 ```
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
 There appears to be strong positive linear relationships between
 horsepower and weight. Similarly, there is a positive approximately
 linear relationship between horsepower and displacement and between
@@ -155,21 +156,55 @@ weakly non-linear relationship with mpg.
 
 ### Question 10
 
-A. The first problem
+``` r
+library(ISLR2)
+```
 
-B. Second problem
+    ## 
+    ## Attaching package: 'ISLR2'
 
-C. third problem
+    ## The following object is masked _by_ '.GlobalEnv':
+    ## 
+    ##     College
 
-D. The first problem
+    ## The following objects are masked from 'package:ISLR':
+    ## 
+    ##     Auto, Credit
 
-E. Second problem
+``` r
+cat("The number of rows in the Boston dataset is",nrow(Boston),".")
+```
 
-F. third problem
+    ## The number of rows in the Boston dataset is 506 .
 
-G. Second problem
+``` r
+cat("The number of columns in the Boston dataset is",ncol(Boston),".")
+```
 
-H. third problem
+    ## The number of columns in the Boston dataset is 13 .
+
+The rows represent different suburbs of Boston and the columns represent
+various housing and area statistics for each suburb.
+
+``` r
+pairs(Boston[,1:6])
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+pairs(Boston[,7:13])
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+par(mfrow=c(3,4))
+for (i in 2:13)
+{plot(Boston$crim,Boston[,i],ylab=names(Boston[i]))}
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 # Chapter 3: Linear Regression
 

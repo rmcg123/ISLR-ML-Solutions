@@ -8,7 +8,7 @@ output: github_document
 
 # Chapter 2: Statistical Learning
 
-8.
+### Question 8
 ```{r}
 library(ISLR)
 summary(College)
@@ -29,7 +29,7 @@ hist(College$PhD,breaks=12)
 ```
   
 
-9.
+### Question 9
   The variables Name and Origin are qualitative and the rest are quantitative.
   
 ```{r}
@@ -41,23 +41,43 @@ for (i in 1:7)
 for (i in 1:7)
 {cat("The mean and standard deviation of",names(Auto)[i],"are",mean(Auto[,i]),"and",sd(Auto[,i]),"\n")}
 ```
- 
-10.
-   A. The first problem
-  
-  B. Second problem
-  
-  C. third problem
-  
-  D. The first problem
-  
-  E. Second problem
-  
-  F. third problem
-  
-  G. Second problem
-  
-  H. third problem
+
+
+```{r}
+Auto2<-Auto[-c(10:85),]
+for (i in 1:7)
+{cat("Having removed the 10th through 85th rows; the range of", names(Auto2)[i],"is",range(Auto2[,i]),"\n and the mean and standard deviation of",names(Auto2)[i],"are",mean(Auto2[,i]),"and",sd(Auto2[,i]),".\n")}
+```
+
+```{r}
+pairs(Auto[,1:7])
+```
+
+There appears to be strong positive linear relationships between horsepower and weight. Similarly, there is a positive approximately linear relationship between horsepower and displacement and between weight and displacement.
+
+The predictors displacement, weight and horsepower seem to be the ones with the most obvious relationship to mpg. Each exhibits a decreasing weakly non-linear relationship with mpg.
+
+### Question 10
+   
+```{r}
+library(ISLR2)
+cat("The number of rows in the Boston dataset is",nrow(Boston),".")
+
+cat("The number of columns in the Boston dataset is",ncol(Boston),".")
+```
+The rows represent different suburbs of Boston and the columns represent various housing and area statistics for each suburb. 
+
+```{r}
+pairs(Boston[,1:6])
+pairs(Boston[,7:13])
+```
+
+```{r}
+par(mfrow=c(3,4))
+for (i in 2:13)
+{plot(Boston$crim,Boston[,i],ylab=names(Boston)[i])}
+```
+
 
 # Chapter 3: Linear Regression
 

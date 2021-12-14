@@ -78,6 +78,7 @@ for (i in 2:13)
 {plot(Boston$crim,Boston[,i],ylab=names(Boston)[i])}
 ```
 
+None of the predictors seem to have a correlation with the per capita 
 
 # Chapter 3: Linear Regression
 

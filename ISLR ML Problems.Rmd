@@ -161,6 +161,24 @@ I've fitted two additional models - one with year and origin including an intera
 
 There are also two non-linear regression models including weight; one with log(weight) as a predictor and the second with a polynomial up to third order. In the former the single predictor is significant while in the latter the linear and quadratic terms are significant.
 
+## Question 10
+
+```{r}
+Carseats.fit1<-lm(Sales~Price+Urban+US,data=Carseats)
+summary(Carseats.fit1)
+Carseats.fit2<-lm(Sales~Price+US,data=Carseats)
+summary(Carseats.fit2)
+confint(Carseats.fit2)
+par(mfrow=c(2,2))
+plot(Carseats.fit2)
+```
+The price and whether the vendor is in the USA are statistically significant predictors. A one unit increase in carseat price will result in around 54 fewer
+sales. Vendors based in the USA can expect to sell 1200 extra units.
+
+Removing Urban makes little change to the coefficient estimates and the significance of the predictors. There does not appear to be any outliers or points with high leverage. 
+
+
+
 # Chapter 4: Classification
 
 # Chapter 5: Resampling Methods

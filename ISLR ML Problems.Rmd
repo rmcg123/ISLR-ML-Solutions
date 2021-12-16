@@ -115,6 +115,25 @@ cat("The number of suburbs that average more than 8 rooms per house is",sum(room
 
 # Chapter 3: Linear Regression
 
+## Question 8
+
+
+```{r}
+Auto.fit1<-lm(mpg~horsepower,data=Auto)
+summary(Auto.fit1)
+predict(Auto.fit1,data.frame(horsepower=(98)),interval="confidence")
+predict(Auto.fit1,data.frame(horsepower=(98)),interval="prediction")
+```
+
+There is a negative relationship between mpg and horsepower. For each unit increase in horsepower the mpg decreases by `coef(Auto.fit1)[2]`. The confidence and prediction intervals for a horsepower of 98 are as given above.
+
+```{r}
+plot(Auto$horsepower,Auto$mpg)
+abline(Auto.fit1)
+par(mfrow=c(2,2))
+plot(Auto.fit1)
+```
+
 # Chapter 4: Classification
 
 # Chapter 5: Resampling Methods

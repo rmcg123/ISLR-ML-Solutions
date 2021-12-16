@@ -284,6 +284,65 @@ cat("The number of suburbs that average more than 8 rooms per house is",sum(room
 
 # Chapter 3: Linear Regression
 
+## Question 8
+
+``` r
+Auto.fit1<-lm(mpg~horsepower,data=Auto)
+summary(Auto.fit1)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ horsepower, data = Auto)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -13.5710  -3.2592  -0.3435   2.7630  16.9240 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 39.935861   0.717499   55.66   <2e-16 ***
+    ## horsepower  -0.157845   0.006446  -24.49   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 4.906 on 390 degrees of freedom
+    ## Multiple R-squared:  0.6059, Adjusted R-squared:  0.6049 
+    ## F-statistic: 599.7 on 1 and 390 DF,  p-value: < 2.2e-16
+
+``` r
+predict(Auto.fit1,data.frame(horsepower=(98)),interval="confidence")
+```
+
+    ##        fit      lwr      upr
+    ## 1 24.46708 23.97308 24.96108
+
+``` r
+predict(Auto.fit1,data.frame(horsepower=(98)),interval="prediction")
+```
+
+    ##        fit     lwr      upr
+    ## 1 24.46708 14.8094 34.12476
+
+There is a negative relationship between mpg and horsepower. For each
+unit increase in horsepower the mpg decreases by `coef(Auto.fit1)[2]`.
+The confidence and prediction intervals for a horsepower of 98 are as
+given above.
+
+``` r
+plot(Auto$horsepower,Auto$mpg)
+abline(Auto.fit1)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+par(mfrow=c(2,2))
+plot(Auto.fit1)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+
 # Chapter 4: Classification
 
 # Chapter 5: Resampling Methods

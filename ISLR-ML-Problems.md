@@ -343,6 +343,190 @@ plot(Auto.fit1)
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
+\#\#Question 9
+
+``` r
+cor(Auto[,1:8])
+```
+
+    ##                     mpg  cylinders displacement horsepower     weight
+    ## mpg           1.0000000 -0.7776175   -0.8051269 -0.7784268 -0.8322442
+    ## cylinders    -0.7776175  1.0000000    0.9508233  0.8429834  0.8975273
+    ## displacement -0.8051269  0.9508233    1.0000000  0.8972570  0.9329944
+    ## horsepower   -0.7784268  0.8429834    0.8972570  1.0000000  0.8645377
+    ## weight       -0.8322442  0.8975273    0.9329944  0.8645377  1.0000000
+    ## acceleration  0.4233285 -0.5046834   -0.5438005 -0.6891955 -0.4168392
+    ## year          0.5805410 -0.3456474   -0.3698552 -0.4163615 -0.3091199
+    ## origin        0.5652088 -0.5689316   -0.6145351 -0.4551715 -0.5850054
+    ##              acceleration       year     origin
+    ## mpg             0.4233285  0.5805410  0.5652088
+    ## cylinders      -0.5046834 -0.3456474 -0.5689316
+    ## displacement   -0.5438005 -0.3698552 -0.6145351
+    ## horsepower     -0.6891955 -0.4163615 -0.4551715
+    ## weight         -0.4168392 -0.3091199 -0.5850054
+    ## acceleration    1.0000000  0.2903161  0.2127458
+    ## year            0.2903161  1.0000000  0.1815277
+    ## origin          0.2127458  0.1815277  1.0000000
+
+``` r
+Auto.fit2<-lm(mpg~.-name,data=Auto)
+summary(Auto.fit2)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ . - name, data = Auto)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -9.5903 -2.1565 -0.1169  1.8690 13.0604 
+    ## 
+    ## Coefficients:
+    ##                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)  -17.218435   4.644294  -3.707  0.00024 ***
+    ## cylinders     -0.493376   0.323282  -1.526  0.12780    
+    ## displacement   0.019896   0.007515   2.647  0.00844 ** 
+    ## horsepower    -0.016951   0.013787  -1.230  0.21963    
+    ## weight        -0.006474   0.000652  -9.929  < 2e-16 ***
+    ## acceleration   0.080576   0.098845   0.815  0.41548    
+    ## year           0.750773   0.050973  14.729  < 2e-16 ***
+    ## origin         1.426141   0.278136   5.127 4.67e-07 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 3.328 on 384 degrees of freedom
+    ## Multiple R-squared:  0.8215, Adjusted R-squared:  0.8182 
+    ## F-statistic: 252.4 on 7 and 384 DF,  p-value: < 2.2e-16
+
+``` r
+par(mfrow=c(2,2))
+plot(Auto.fit2)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+Auto.fit3<-lm(mpg~year+origin+year:origin,data=Auto)
+summary(Auto.fit3)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ year + origin + year:origin, data = Auto)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -11.3141  -3.7120  -0.6513   3.3621  15.5859 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) -83.3809    12.0000  -6.948 1.57e-11 ***
+    ## year          1.3089     0.1576   8.305 1.68e-15 ***
+    ## origin       17.3752     6.8325   2.543   0.0114 *  
+    ## year:origin  -0.1663     0.0889  -1.871   0.0621 .  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 5.199 on 388 degrees of freedom
+    ## Multiple R-squared:  0.5596, Adjusted R-squared:  0.5562 
+    ## F-statistic: 164.4 on 3 and 388 DF,  p-value: < 2.2e-16
+
+``` r
+Auto.fit4<-lm(mpg~year*weight,data=Auto)
+summary(Auto.fit4)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ year * weight, data = Auto)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -8.0397 -1.9956 -0.0983  1.6525 12.9896 
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) -1.105e+02  1.295e+01  -8.531 3.30e-16 ***
+    ## year         2.040e+00  1.718e-01  11.876  < 2e-16 ***
+    ## weight       2.755e-02  4.413e-03   6.242 1.14e-09 ***
+    ## year:weight -4.579e-04  5.907e-05  -7.752 8.02e-14 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 3.193 on 388 degrees of freedom
+    ## Multiple R-squared:  0.8339, Adjusted R-squared:  0.8326 
+    ## F-statistic: 649.3 on 3 and 388 DF,  p-value: < 2.2e-16
+
+``` r
+Auto.fit5<-lm(mpg~log(weight),data=Auto)
+summary(Auto.fit5)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ log(weight), data = Auto)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -12.4315  -2.6752  -0.2888   1.9429  16.0136 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept) 209.9433     6.0002   34.99   <2e-16 ***
+    ## log(weight) -23.4317     0.7534  -31.10   <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 4.189 on 390 degrees of freedom
+    ## Multiple R-squared:  0.7127, Adjusted R-squared:  0.7119 
+    ## F-statistic: 967.3 on 1 and 390 DF,  p-value: < 2.2e-16
+
+``` r
+Auto.fit6<-lm(mpg~poly(weight,3),data=Auto)
+summary(Auto.fit6)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = mpg ~ poly(weight, 3), data = Auto)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -12.6259  -2.7080  -0.3552   1.8385  16.0816 
+    ## 
+    ## Coefficients:
+    ##                   Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)        23.4459     0.2112 111.008  < 2e-16 ***
+    ## poly(weight, 3)1 -128.4436     4.1817 -30.716  < 2e-16 ***
+    ## poly(weight, 3)2   23.1589     4.1817   5.538 5.65e-08 ***
+    ## poly(weight, 3)3    0.2204     4.1817   0.053    0.958    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 4.182 on 388 degrees of freedom
+    ## Multiple R-squared:  0.7151, Adjusted R-squared:  0.7129 
+    ## F-statistic: 324.7 on 3 and 388 DF,  p-value: < 2.2e-16
+
+There is a relationship between the predictors and the response
+evidenced by the p-value of the F-statistic. The predictors year,
+origin, weight and displacement are statistically significant. For each
+unit increase in year the miles per gallon increases by 0.75.
+
+There appears to be a systematic trend to the residuals in the first
+plot indicating a mild non-linearity. Values at 323 and 326 are
+potentially outliers with standardised residuals close to 4 in absolute
+magnitude. Observation 14 is a reasonably high leverage point.
+
+I’ve fitted two additional models - one with year and origin including
+an interaction and one with year and weight including an interaction.
+For the former only the year predictor is significant while for the
+latter both predictors and their interaction are significant.
+
+There are also two non-linear regression models including weight; one
+with log(weight) as a predictor and the second with a polynomial up to
+third order. In the former the single predictor is significant while in
+the latter the linear and quadratic terms are significant.
+
 # Chapter 4: Classification
 
 # Chapter 5: Resampling Methods

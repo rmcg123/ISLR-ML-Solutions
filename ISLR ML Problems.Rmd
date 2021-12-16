@@ -134,6 +134,33 @@ par(mfrow=c(2,2))
 plot(Auto.fit1)
 ```
 
+##Question 9
+
+```{r}
+cor(Auto[,1:8])
+Auto.fit2<-lm(mpg~.-name,data=Auto)
+summary(Auto.fit2)
+par(mfrow=c(2,2))
+plot(Auto.fit2)
+Auto.fit3<-lm(mpg~year+origin+year:origin,data=Auto)
+summary(Auto.fit3)
+Auto.fit4<-lm(mpg~year*weight,data=Auto)
+summary(Auto.fit4)
+Auto.fit5<-lm(mpg~log(weight),data=Auto)
+summary(Auto.fit5)
+Auto.fit6<-lm(mpg~poly(weight,3),data=Auto)
+summary(Auto.fit6)
+
+```
+
+There is a relationship between the predictors and the response evidenced by the p-value of the F-statistic. The predictors year, origin, weight and displacement are statistically significant. For each unit increase in year the miles per gallon increases by 0.75.
+
+There appears to be a systematic trend to the residuals in the first plot indicating a mild non-linearity. Values at 323 and 326 are potentially outliers with standardised residuals close to 4 in absolute magnitude. Observation 14 is a reasonably high leverage point.
+
+I've fitted two additional models - one with year and origin including an interaction and one with year and weight including an interaction. For the former only the year predictor is significant while for the latter both predictors and their interaction are significant.
+
+There are also two non-linear regression models including weight; one with log(weight) as a predictor and the second with a polynomial up to third order. In the former the single predictor is significant while in the latter the linear and quadratic terms are significant.
+
 # Chapter 4: Classification
 
 # Chapter 5: Resampling Methods

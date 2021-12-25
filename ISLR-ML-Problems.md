@@ -601,9 +601,152 @@ in around 54 fewer sales. Vendors based in the USA can expect to sell
 1200 extra units.
 
 Removing Urban makes little change to the coefficient estimates and the
-significance of the predictors.
+significance of the predictors. There does not appear to be any outliers
+or points with high leverage.
 
 # Chapter 4: Classification
+
+## Question 13
+
+``` r
+summary(Weekly)
+```
+
+    ##       Year           Lag1               Lag2               Lag3         
+    ##  Min.   :1990   Min.   :-18.1950   Min.   :-18.1950   Min.   :-18.1950  
+    ##  1st Qu.:1995   1st Qu.: -1.1540   1st Qu.: -1.1540   1st Qu.: -1.1580  
+    ##  Median :2000   Median :  0.2410   Median :  0.2410   Median :  0.2410  
+    ##  Mean   :2000   Mean   :  0.1506   Mean   :  0.1511   Mean   :  0.1472  
+    ##  3rd Qu.:2005   3rd Qu.:  1.4050   3rd Qu.:  1.4090   3rd Qu.:  1.4090  
+    ##  Max.   :2010   Max.   : 12.0260   Max.   : 12.0260   Max.   : 12.0260  
+    ##       Lag4               Lag5              Volume            Today         
+    ##  Min.   :-18.1950   Min.   :-18.1950   Min.   :0.08747   Min.   :-18.1950  
+    ##  1st Qu.: -1.1580   1st Qu.: -1.1660   1st Qu.:0.33202   1st Qu.: -1.1540  
+    ##  Median :  0.2380   Median :  0.2340   Median :1.00268   Median :  0.2410  
+    ##  Mean   :  0.1458   Mean   :  0.1399   Mean   :1.57462   Mean   :  0.1499  
+    ##  3rd Qu.:  1.4090   3rd Qu.:  1.4050   3rd Qu.:2.05373   3rd Qu.:  1.4050  
+    ##  Max.   : 12.0260   Max.   : 12.0260   Max.   :9.32821   Max.   : 12.0260  
+    ##  Direction 
+    ##  Down:484  
+    ##  Up  :605  
+    ##            
+    ##            
+    ##            
+    ## 
+
+``` r
+pairs(Weekly[,-9])
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+weekly.fit<-glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial)
+summary(weekly.fit)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + 
+    ##     Volume, family = binomial, data = Weekly)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -1.6949  -1.2565   0.9913   1.0849   1.4579  
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error z value Pr(>|z|)   
+    ## (Intercept)  0.26686    0.08593   3.106   0.0019 **
+    ## Lag1        -0.04127    0.02641  -1.563   0.1181   
+    ## Lag2         0.05844    0.02686   2.175   0.0296 * 
+    ## Lag3        -0.01606    0.02666  -0.602   0.5469   
+    ## Lag4        -0.02779    0.02646  -1.050   0.2937   
+    ## Lag5        -0.01447    0.02638  -0.549   0.5833   
+    ## Volume      -0.02274    0.03690  -0.616   0.5377   
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 1496.2  on 1088  degrees of freedom
+    ## Residual deviance: 1486.4  on 1082  degrees of freedom
+    ## AIC: 1500.4
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+``` r
+weekly.prob<-predict(weekly.fit,type="response")
+weekly.pred<-rep("Down",dim(Weekly)[1])
+weekly.pred[weekly.prob>0.5]="Up"
+table(weekly.pred,Weekly$Direction)
+```
+
+    ##            
+    ## weekly.pred Down  Up
+    ##        Down   54  48
+    ##        Up    430 557
+
+``` r
+weekly.train<-(Weekly$Year<2009)
+Weekly.test<-Weekly[!weekly.train,]
+Direction.test<-Weekly$Direction[!weekly.train]
+weekly.fit2<-glm(Direction~Lag2,data=Weekly,family=binomial,subset=weekly.train)
+weekly.prob2<-predict(weekly.fit2,Weekly.test,type="response")
+weekly.pred2<-rep("Down",dim(Weekly.test)[1])
+weekly.pred2[weekly.prob2>0.5]="Up"
+table(weekly.pred2,Direction.test)
+```
+
+    ##             Direction.test
+    ## weekly.pred2 Down Up
+    ##         Down    9  5
+    ##         Up     34 56
+
+There appears to be a relationship between volume and year. In the
+logistic regression the only predictor that is significant is Lag2. The
+fraction of correct predictions on the test data using logistic
+regression is (9+56)/104=0.625.
+
+``` r
+library(MASS)
+```
+
+    ## 
+    ## Attaching package: 'MASS'
+
+    ## The following object is masked from 'package:ISLR2':
+    ## 
+    ##     Boston
+
+``` r
+weekly.fit3<-lda(Direction~Lag2,data=Weekly,subset=weekly.train)
+weekly.prob3<-predict(weekly.fit3,Weekly.test)
+weekly.class<-weekly.prob3$class
+table(weekly.class,Direction.test)
+```
+
+    ##             Direction.test
+    ## weekly.class Down Up
+    ##         Down    9  5
+    ##         Up     34 56
+
+Linear discriminant analysis also successfully predicts 0.625 of cases
+correctly.
+
+``` r
+weekly.fit4<-qda(Direction~Lag2,data=Weekly,subset=weekly.train)
+weekly.prob4<-predict(weekly.fit4,Weekly.test)
+weekly.classqda<-weekly.prob4$class
+table(weekly.classqda,Direction.test)
+```
+
+    ##                Direction.test
+    ## weekly.classqda Down Up
+    ##            Down    0  0
+    ##            Up     43 61
+
+Quadratic discriminant analysis correctly predicts 61/104 instances
+representing 0.586 of cases.
 
 # Chapter 5: Resampling Methods
 

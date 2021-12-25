@@ -181,6 +181,51 @@ Removing Urban makes little change to the coefficient estimates and the signific
 
 # Chapter 4: Classification
 
+## Question 13
+
+```{r}
+
+summary(Weekly)
+pairs(Weekly[,-9])
+weekly.fit<-glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume,data=Weekly,family=binomial)
+summary(weekly.fit)
+weekly.prob<-predict(weekly.fit,type="response")
+weekly.pred<-rep("Down",dim(Weekly)[1])
+weekly.pred[weekly.prob>0.5]="Up"
+table(weekly.pred,Weekly$Direction)
+weekly.train<-(Weekly$Year<2009)
+Weekly.test<-Weekly[!weekly.train,]
+Direction.test<-Weekly$Direction[!weekly.train]
+weekly.fit2<-glm(Direction~Lag2,data=Weekly,family=binomial,subset=weekly.train)
+weekly.prob2<-predict(weekly.fit2,Weekly.test,type="response")
+weekly.pred2<-rep("Down",dim(Weekly.test)[1])
+weekly.pred2[weekly.prob2>0.5]="Up"
+table(weekly.pred2,Direction.test)
+```
+
+There appears to be a relationship between volume and year. In the logistic regression the only predictor that is significant is Lag2. The fraction of correct predictions on the test data using logistic regression is (9+56)/104=0.625.
+
+```{r}
+library(MASS)
+weekly.fit3<-lda(Direction~Lag2,data=Weekly,subset=weekly.train)
+weekly.prob3<-predict(weekly.fit3,Weekly.test)
+weekly.class<-weekly.prob3$class
+table(weekly.class,Direction.test)
+
+```
+
+Linear discriminant analysis also successfully predicts 0.625 of cases correctly.
+
+```{r}
+weekly.fit4<-qda(Direction~Lag2,data=Weekly,subset=weekly.train)
+weekly.prob4<-predict(weekly.fit4,Weekly.test)
+weekly.classqda<-weekly.prob4$class
+table(weekly.classqda,Direction.test)
+```
+
+Quadratic discriminant analysis correctly predicts 61/104 instances representing 0.586 of cases.
+
+
 # Chapter 5: Resampling Methods
 
 # Chapter 6: Linear Model Selection and Regularisation

@@ -748,6 +748,39 @@ table(weekly.classqda,Direction.test)
 Quadratic discriminant analysis correctly predicts 61/104 instances
 representing 0.586 of cases.
 
+``` r
+library(class)
+train.knnx<-data.frame(Weekly$Lag2[weekly.train])
+test.knnx<-data.frame(Weekly$Lag2[!weekly.train])
+train.Direction<-Weekly$Direction[weekly.train]
+set.seed(1)
+knnweekly<-knn(train.knnx,test.knnx,train.Direction,k=1)
+table(knnweekly,Direction.test)
+```
+
+    ##          Direction.test
+    ## knnweekly Down Up
+    ##      Down   21 30
+    ##      Up     22 31
+
+K nearest neighbours with k=1 correctly predicts 52/104=0.5 of the test
+instances.
+
+``` r
+library(e1071)
+nb.fit<-naiveBayes(Direction~Lag2,data=Weekly,subset=weekly.train)
+nb.class<-predict(nb.fit,Weekly.test)
+table(nb.class,Direction.test)
+```
+
+    ##         Direction.test
+    ## nb.class Down Up
+    ##     Down    0  0
+    ##     Up     43 61
+
+The naive Bayes classifier correctly identifies 61/104=0.586 instances
+in the test set.
+
 # Chapter 5: Resampling Methods
 
 # Chapter 6: Linear Model Selection and Regularisation

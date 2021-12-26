@@ -246,6 +246,74 @@ table(nb.class,Direction.test)
 
 The naive Bayes classifier correctly identifies 61/104=0.586 instances in the test set.
 
+
+The linear regression and linear discriminant analysis classifier perform best on the test data set.
+
+## Question 14
+
+```{r}
+mpg01<-rep(0,dim(Auto)[1])
+mpg01[Auto$mpg>median(Auto$mpg)]=1
+Auto01<-data.frame(Auto,mpg01)
+par(mfrow=c(2,2))
+for (i in 2:8)
+{boxplot(Auto01[,i]~mpg01,ylab=names(Auto01)[i])}
+Auto01.train<-(Auto01$year<80)
+Auto01.test<-Auto01[!Auto01.train,]
+mpg01.test<-Auto01$mpg01[!Auto01.train]
+```
+Weight, horsepower and displacement seem to be the most important predictors for mpg01.
+
+
+```{r}
+ldaauto.fit<-lda(mpg01~weight+horsepower+displacement,data=Auto01,subset=Auto01.train)
+ldaauto.fit.pred<-predict(ldaauto.fit,Auto01.test)$class
+table(ldaauto.fit.pred,mpg01.test)
+```
+A linear discriminant analysis classifier based on weight, horsepower and displacement correctly classified 76/85=0.894 of test data instances meaning the error rate was 0.106. 
+
+```{r}
+qdaauto.fit<-qda(mpg01~weight+horsepower+displacement,data=Auto01,subset=Auto01.train)
+qdaauto.fit.pred<-predict(qdaauto.fit,Auto01.test)$class
+table(qdaauto.fit.pred,mpg01.test)
+```
+A quadratic discriminant analysis classifier based on weight, horsepower and displacement correctly classified 74/85=0.870 of test data instances meaning the error rate was 0.130. 
+
+```{r}
+lrauto.fit<-glm(mpg01~weight+horsepower+displacement,data=Auto01,family="binomial",subset=Auto01.train)
+lrauto.prob<-predict(lrauto.fit,Auto01.test,type="response")
+lrauto.pred<-rep(0,length(lrauto.prob))
+lrauto.pred[lrauto.prob>0.5]=1
+table(lrauto.pred,mpg01.test)
+```
+Logistic regression correctly identifies 70/85=0.823 test instances meaning the error rate is 0.177.
+
+```{r}
+nbauto.fit<-naiveBayes(mpg01~weight+horsepower+displacement,data=Auto01,subset=Auto01.train)
+nbauto.pred<-predict(nbauto.fit,Auto01.test)
+table(nbauto.pred,mpg01.test)
+```
+Naive Bayes correctly identifies 78/85=0.918 instances of the test data set meaning the error rate is 0.812.
+
+```{r}
+knnauto.train<-cbind(Auto01$weight,Auto01$horsepower,Auto01$displacement)[Auto01.train,]
+knnauto.test<-cbind(Auto01$weight,Auto01$horsepower,Auto01$displacement)[!Auto01.train,]
+set.seed(1)
+knnauto.fit1<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=1)
+table(knnauto.fit1,mpg01.test)
+knnauto.fit2<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=2)
+table(knnauto.fit2,mpg01.test)
+knnauto.fit3<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=3)
+table(knnauto.fit3,mpg01.test)
+knnauto.fit4<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=4)
+table(knnauto.fit4,mpg01.test)
+knnauto.fit5<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=5)
+table(knnauto.fit5,mpg01.test)
+knnauto.fit6<-knn(knnauto.train,knnauto.test,mpg01[Auto01.train],k=6)
+table(knnauto.fit6,mpg01.test)
+```
+K nearest neighbours with k=1 correctly identifies 68/85=0.8 instances in the test data set meaningt the error rate is 0.2. K=1 performs best out of all possibilities between 1 and 6. 
+
 # Chapter 5: Resampling Methods
 
 # Chapter 6: Linear Model Selection and Regularisation

@@ -391,6 +391,32 @@ cat("The leave-one-out-cross-validation estimate for the test error is", sum(err
 
 # Chapter 6: Linear Model Selection and Regularisation
 
+## Question 8 
+
+```{r}
+library("leaps")
+x<-rnorm(100)
+eps<-rnorm(100,mean=0,sd=0.1)
+b0=0.5
+b1=0.2
+b2=-0.05
+b3=0.01
+y<-b0+b1*x+b2*x^2+b3*x^3+eps
+SData<-data.frame(x,y)
+regfit.sdata<-regsubsets(y~poly(x,10),data=SData)
+sumregfit.sdata<-summary(regfit.sdata)
+sumregfit.sdata
+par(mfrow=c(2,2))
+plot(sumregfit.sdata$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata$adjr2),sumregfit.sdata$adjr2[which.max(sumregfit.sdata$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata$cp),sumregfit.sdata$cp[which.min(sumregfit.sdata$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata$bic),sumregfit.sdata$bic[which.min(sumregfit.sdata$bic)],col = "red", cex = 2,pch = 20)
+```
+
+
 # Chapter 7: Moving Beyond Linearity
 
 # Chapter 8: Tree Based Methods

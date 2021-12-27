@@ -343,6 +343,23 @@ vs.error2=(tbl2[2]+tbl2[3])/5000
 vs.error2
 ```
 
+## Question 6
+
+```{r}
+summary(lr.fit3)$coef
+```
+
+
+The standard error associated with the coefficient estimates are 4.985e-6 for the income coefficient and 2.274e-4 for the balance coefficient.
+
+```{r}
+library(boot)
+set.seed(3)
+boot.fn<-function(data,index){
+  coef(glm(default~income+balance,data = data,subset = index,family="binomial"))}
+boot(Default,boot.fn,100)
+```
+The standard error estimate using the bootstrap method is 4.785e-6 for the income coefficient and 2.554e-4 for the balance coefficient. These estimates are both quite comparable with the linear regression estimates.
 
 # Chapter 6: Linear Model Selection and Regularisation
 

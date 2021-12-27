@@ -998,6 +998,48 @@ vs.error2
 
     ## [1] 0.029
 
+## Question 6
+
+``` r
+summary(lr.fit3)$coef
+```
+
+    ##                  Estimate   Std. Error    z value      Pr(>|z|)
+    ## (Intercept) -1.154047e+01 4.347564e-01 -26.544680 2.958355e-155
+    ## income       2.080898e-05 4.985167e-06   4.174178  2.990638e-05
+    ## balance      5.647103e-03 2.273731e-04  24.836280 3.638120e-136
+
+The standard error associated with the coefficient estimates are
+4.985e-6 for the income coefficient and 2.274e-4 for the balance
+coefficient.
+
+``` r
+library(boot)
+set.seed(3)
+boot.fn<-function(data,index){
+  coef(glm(default~income+balance,data = data,subset = index,family="binomial"))}
+boot(Default,boot.fn,100)
+```
+
+    ## 
+    ## ORDINARY NONPARAMETRIC BOOTSTRAP
+    ## 
+    ## 
+    ## Call:
+    ## boot(data = Default, statistic = boot.fn, R = 100)
+    ## 
+    ## 
+    ## Bootstrap Statistics :
+    ##          original        bias     std. error
+    ## t1* -1.154047e+01 -2.494434e-02 4.570045e-01
+    ## t2*  2.080898e-05 -2.500829e-07 4.785038e-06
+    ## t3*  5.647103e-03  2.363975e-05 2.554328e-04
+
+The standard error estimate using the bootstrap method is 4.785e-6 for
+the income coefficient and 2.554e-4 for the balance coefficient. These
+estimates are both quite comparable with the linear regression
+estimates.
+
 # Chapter 6: Linear Model Selection and Regularisation
 
 # Chapter 7: Moving Beyond Linearity

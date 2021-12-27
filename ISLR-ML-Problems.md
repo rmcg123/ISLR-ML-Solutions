@@ -1040,6 +1040,53 @@ the income coefficient and 2.554e-4 for the balance coefficient. These
 estimates are both quite comparable with the linear regression
 estimates.
 
+## Question 7
+
+``` r
+lr.week<-glm(Direction~Lag1+Lag2,data=Weekly,family="binomial")
+lr.weekl<-glm(Direction~Lag1+Lag2,data=Weekly[-1,],family="binomial")
+lr.weekl.prob<-predict(lr.weekl,Weekly[1,],type="response")
+if (lr.weekl.prob>0.5)
+{lr.weekl.pred<-1} else 
+{lr.weekl.pred<-0}
+contrasts(Weekly$Direction)
+```
+
+    ##      Up
+    ## Down  0
+    ## Up    1
+
+``` r
+lr.weekl.pred
+```
+
+    ## [1] 1
+
+``` r
+Weekly$Direction[1]
+```
+
+    ## [1] Down
+    ## Levels: Down Up
+
+``` r
+error<-rep(0,dim(Weekly)[1])
+for (i in 1:1089)
+{lr.weekl<-glm(Direction~Lag1+Lag2,data=Weekly[-i,],family="binomial")
+lr.weeekl.prob<-predict(lr.weekl,Weekly[i,],type="response")
+if (lr.weekl.prob>0.5)
+{lr.weekl.pred<-1} else 
+{lr.weekl.pred<-0}
+if (lr.weekl.pred==1&&Weekly$Direction[i]=="Down")
+{error[i]=1} else if (lr.weekl.pred==0&&Weekly$Direction[i]=="Up")
+{error[i]=1} else
+{error[i]=0}
+}
+cat("The leave-one-out-cross-validation estimate for the test error is", sum(error)/dim(Weekly)[1])
+```
+
+    ## The leave-one-out-cross-validation estimate for the test error is 0.4444444
+
 # Chapter 6: Linear Model Selection and Regularisation
 
 # Chapter 7: Moving Beyond Linearity

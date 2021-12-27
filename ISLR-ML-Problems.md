@@ -936,6 +936,68 @@ out of all possibilities between 1 and 6.
 
 # Chapter 5: Resampling Methods
 
+## Question 5
+
+``` r
+lr.fit3<-glm(default~income+balance,data=Default,family="binomial")
+summary(lr.fit3)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = default ~ income + balance, family = "binomial", 
+    ##     data = Default)
+    ## 
+    ## Deviance Residuals: 
+    ##     Min       1Q   Median       3Q      Max  
+    ## -2.4725  -0.1444  -0.0574  -0.0211   3.7245  
+    ## 
+    ## Coefficients:
+    ##               Estimate Std. Error z value Pr(>|z|)    
+    ## (Intercept) -1.154e+01  4.348e-01 -26.545  < 2e-16 ***
+    ## income       2.081e-05  4.985e-06   4.174 2.99e-05 ***
+    ## balance      5.647e-03  2.274e-04  24.836  < 2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 2920.6  on 9999  degrees of freedom
+    ## Residual deviance: 1579.0  on 9997  degrees of freedom
+    ## AIC: 1585
+    ## 
+    ## Number of Fisher Scoring iterations: 8
+
+``` r
+vs.error<-rep(0,4)
+for (i in 1:4)
+{set.seed(i)
+Default.train<-sample(10000,5000)
+lr.fitdef<-glm(default~income+balance,data=Default,family="binomial",subset=Default.train)
+lr.def.prob<-predict(lr.fitdef,Default[-Default.train,],type="response")
+lr.def.pred<-rep("No",5000)
+lr.def.pred[lr.def.prob>0.5]="Yes"
+tbl<-table(lr.def.pred,Default$default[-Default.train])
+vs.error[i]=(tbl[2]+tbl[3])/5000}
+vs.error
+```
+
+    ## [1] 0.0254 0.0238 0.0264 0.0256
+
+``` r
+set.seed(5)
+Default.train<-sample(10000,5000)
+lr.fit4<-glm(default~income+balance+student,data=Default,family="binomial",subset=Default.train)
+lr.def.prob4<-predict(lr.fit4,Default[-Default.train,],type="response")
+lr.def.pred4<-rep("No",5000)
+lr.def.pred4[lr.def.prob4>0.5]="Yes"
+tbl2<-table(lr.def.pred4,Default$default[-Default.train])
+vs.error2=(tbl2[2]+tbl2[3])/5000
+vs.error2
+```
+
+    ## [1] 0.029
+
 # Chapter 6: Linear Model Selection and Regularisation
 
 # Chapter 7: Moving Beyond Linearity

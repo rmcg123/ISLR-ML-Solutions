@@ -316,6 +316,34 @@ K nearest neighbours with k=1 correctly identifies 68/85=0.8 instances in the te
 
 # Chapter 5: Resampling Methods
 
+## Question 5
+
+```{r}
+lr.fit3<-glm(default~income+balance,data=Default,family="binomial")
+summary(lr.fit3)
+vs.error<-rep(0,4)
+for (i in 1:4)
+{set.seed(i)
+Default.train<-sample(10000,5000)
+lr.fitdef<-glm(default~income+balance,data=Default,family="binomial",subset=Default.train)
+lr.def.prob<-predict(lr.fitdef,Default[-Default.train,],type="response")
+lr.def.pred<-rep("No",5000)
+lr.def.pred[lr.def.prob>0.5]="Yes"
+tbl<-table(lr.def.pred,Default$default[-Default.train])
+vs.error[i]=(tbl[2]+tbl[3])/5000}
+vs.error
+set.seed(5)
+Default.train<-sample(10000,5000)
+lr.fit4<-glm(default~income+balance+student,data=Default,family="binomial",subset=Default.train)
+lr.def.prob4<-predict(lr.fit4,Default[-Default.train,],type="response")
+lr.def.pred4<-rep("No",5000)
+lr.def.pred4[lr.def.prob4>0.5]="Yes"
+tbl2<-table(lr.def.pred4,Default$default[-Default.train])
+vs.error2=(tbl2[2]+tbl2[3])/5000
+vs.error2
+```
+
+
 # Chapter 6: Linear Model Selection and Regularisation
 
 # Chapter 7: Moving Beyond Linearity

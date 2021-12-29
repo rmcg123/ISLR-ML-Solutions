@@ -416,6 +416,62 @@ plot(sumregfit.sdata$bic,xlab="Number of variables",ylab="BIC",type="l")
 points(which.min(sumregfit.sdata$bic),sumregfit.sdata$bic[which.min(sumregfit.sdata$bic)],col = "red", cex = 2,pch = 20)
 ```
 
+Following best-subset selection, the adjusted R-squared statistic picks a model with 8 variables. Cp selects a model with 5 variables and BIC picks a model with 4 variables.
+
+```{r}
+regfit.sdata.back<-regsubsets(y~poly(x,10),data=SData,method="backward")
+sumregfit.sdata.back<-summary(regfit.sdata.back)
+sumregfit.sdata.back
+par(mfrow=c(2,2))
+plot(sumregfit.sdata.back$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata.back$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata.back$adjr2),sumregfit.sdata.back$adjr2[which.max(sumregfit.sdata.back$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.back$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata.back$cp),sumregfit.sdata.back$cp[which.min(sumregfit.sdata.back$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.back$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata.back$bic),sumregfit.sdata.back$bic[which.min(sumregfit.sdata.back$bic)],col = "red", cex = 2,pch = 20)
+```
+Using backward selection the preferred models are 6 variables from adjusted R-squared, 3 variables from Cp and 2 variables from BIC.
+
+```{r}
+regfit.sdata.fwd<-regsubsets(y~poly(x,10),data=SData,method="forward")
+sumregfit.sdata.fwd<-summary(regfit.sdata.fwd)
+sumregfit.sdata.fwd
+par(mfrow=c(2,2))
+plot(sumregfit.sdata.fwd$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata.fwd$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata.fwd$adjr2),sumregfit.sdata.fwd$adjr2[which.max(sumregfit.sdata.fwd$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.fwd$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata.fwd$cp),sumregfit.sdata.fwd$cp[which.min(sumregfit.sdata.fwd$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.fwd$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata.fwd$bic),sumregfit.sdata.fwd$bic[which.min(sumregfit.sdata.fwd$bic)],col = "red", cex = 2,pch = 20)
+```
+Forward selection leads to a 6 variable model for adjusted R-squared, a 3 variable model for Cp and a 2 variable model for BIC.
+
+```{r}
+library(glmnet)
+grid<-10^seq(10,-2,length=100)
+x.vars=matrix(rep(rep(0,100),10),nrow=100,ncol=10)
+for (i in 1:10)
+{x.vars[,i]=x^i}
+lasso.fit<-glmnet(x.vars,y,alpha=1,lambda=grid)
+par(mfrow=c(1,2))
+plot(coef(lasso.fit)[,],ylab="Coefficient estimates")
+plot(lasso.fit)
+```
+```{r}
+set.seed(1)
+train<-sample(1:length(x),length(x)/2)
+test<-(-train)
+y.test<-y[test]
+lasso.fit2<-glmnet(x.vars[train,],y[train],alpha=1,lambda=grid)
+cv.lasso.fit<-cv.glmnet(x.vars[train,],y[train],alpha=1,lambda=grid)
+plot(cv.lasso.fit)
+bestlam<-cv.lasso.fit$lambda.min
+bestlam
+lasso.pred<-predict(lasso.fit2,s=bestlam,newx=x.vars[test,])
+mean (( lasso.pred - y.test)^2)
+```
 
 # Chapter 7: Moving Beyond Linearity
 

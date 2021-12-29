@@ -1089,6 +1089,237 @@ cat("The leave-one-out-cross-validation estimate for the test error is", sum(err
 
 # Chapter 6: Linear Model Selection and Regularisation
 
+## Question 8
+
+``` r
+library("leaps")
+x<-rnorm(100)
+eps<-rnorm(100,mean=0,sd=0.1)
+b0=0.5
+b1=0.2
+b2=-0.05
+b3=0.01
+y<-b0+b1*x+b2*x^2+b3*x^3+eps
+SData<-data.frame(x,y)
+regfit.sdata<-regsubsets(y~poly(x,10),data=SData)
+sumregfit.sdata<-summary(regfit.sdata)
+sumregfit.sdata
+```
+
+    ## Subset selection object
+    ## Call: regsubsets.formula(y ~ poly(x, 10), data = SData)
+    ## 10 Variables  (and intercept)
+    ##               Forced in Forced out
+    ## poly(x, 10)1      FALSE      FALSE
+    ## poly(x, 10)2      FALSE      FALSE
+    ## poly(x, 10)3      FALSE      FALSE
+    ## poly(x, 10)4      FALSE      FALSE
+    ## poly(x, 10)5      FALSE      FALSE
+    ## poly(x, 10)6      FALSE      FALSE
+    ## poly(x, 10)7      FALSE      FALSE
+    ## poly(x, 10)8      FALSE      FALSE
+    ## poly(x, 10)9      FALSE      FALSE
+    ## poly(x, 10)10     FALSE      FALSE
+    ## 1 subsets of each size up to 8
+    ## Selection Algorithm: exhaustive
+    ##          poly(x, 10)1 poly(x, 10)2 poly(x, 10)3 poly(x, 10)4 poly(x, 10)5
+    ## 1  ( 1 ) "*"          " "          " "          " "          " "         
+    ## 2  ( 1 ) "*"          "*"          " "          " "          " "         
+    ## 3  ( 1 ) "*"          "*"          "*"          " "          " "         
+    ## 4  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 5  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 6  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 7  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 8  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+    ##          poly(x, 10)6 poly(x, 10)7 poly(x, 10)8 poly(x, 10)9 poly(x, 10)10
+    ## 1  ( 1 ) " "          " "          " "          " "          " "          
+    ## 2  ( 1 ) " "          " "          " "          " "          " "          
+    ## 3  ( 1 ) " "          " "          " "          " "          " "          
+    ## 4  ( 1 ) " "          " "          " "          " "          " "          
+    ## 5  ( 1 ) " "          " "          " "          "*"          " "          
+    ## 6  ( 1 ) "*"          " "          " "          "*"          " "          
+    ## 7  ( 1 ) "*"          " "          " "          "*"          "*"          
+    ## 8  ( 1 ) "*"          " "          " "          "*"          "*"
+
+``` r
+par(mfrow=c(2,2))
+plot(sumregfit.sdata$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata$adjr2),sumregfit.sdata$adjr2[which.max(sumregfit.sdata$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata$cp),sumregfit.sdata$cp[which.min(sumregfit.sdata$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata$bic),sumregfit.sdata$bic[which.min(sumregfit.sdata$bic)],col = "red", cex = 2,pch = 20)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+
+Following best-subset selection, the adjusted R-squared statistic picks
+a model with 8 variables. Cp selects a model with 5 variables and BIC
+picks a model with 4 variables.
+
+``` r
+regfit.sdata.back<-regsubsets(y~poly(x,10),data=SData,method="backward")
+sumregfit.sdata.back<-summary(regfit.sdata.back)
+sumregfit.sdata.back
+```
+
+    ## Subset selection object
+    ## Call: regsubsets.formula(y ~ poly(x, 10), data = SData, method = "backward")
+    ## 10 Variables  (and intercept)
+    ##               Forced in Forced out
+    ## poly(x, 10)1      FALSE      FALSE
+    ## poly(x, 10)2      FALSE      FALSE
+    ## poly(x, 10)3      FALSE      FALSE
+    ## poly(x, 10)4      FALSE      FALSE
+    ## poly(x, 10)5      FALSE      FALSE
+    ## poly(x, 10)6      FALSE      FALSE
+    ## poly(x, 10)7      FALSE      FALSE
+    ## poly(x, 10)8      FALSE      FALSE
+    ## poly(x, 10)9      FALSE      FALSE
+    ## poly(x, 10)10     FALSE      FALSE
+    ## 1 subsets of each size up to 8
+    ## Selection Algorithm: backward
+    ##          poly(x, 10)1 poly(x, 10)2 poly(x, 10)3 poly(x, 10)4 poly(x, 10)5
+    ## 1  ( 1 ) "*"          " "          " "          " "          " "         
+    ## 2  ( 1 ) "*"          "*"          " "          " "          " "         
+    ## 3  ( 1 ) "*"          "*"          "*"          " "          " "         
+    ## 4  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 5  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 6  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 7  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 8  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+    ##          poly(x, 10)6 poly(x, 10)7 poly(x, 10)8 poly(x, 10)9 poly(x, 10)10
+    ## 1  ( 1 ) " "          " "          " "          " "          " "          
+    ## 2  ( 1 ) " "          " "          " "          " "          " "          
+    ## 3  ( 1 ) " "          " "          " "          " "          " "          
+    ## 4  ( 1 ) " "          " "          " "          " "          " "          
+    ## 5  ( 1 ) " "          " "          " "          "*"          " "          
+    ## 6  ( 1 ) "*"          " "          " "          "*"          " "          
+    ## 7  ( 1 ) "*"          " "          " "          "*"          "*"          
+    ## 8  ( 1 ) "*"          " "          " "          "*"          "*"
+
+``` r
+par(mfrow=c(2,2))
+plot(sumregfit.sdata.back$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata.back$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata.back$adjr2),sumregfit.sdata.back$adjr2[which.max(sumregfit.sdata.back$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.back$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata.back$cp),sumregfit.sdata.back$cp[which.min(sumregfit.sdata.back$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.back$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata.back$bic),sumregfit.sdata.back$bic[which.min(sumregfit.sdata.back$bic)],col = "red", cex = 2,pch = 20)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+Using backward selection the preferred models are 6 variables from
+adjusted R-squared, 3 variables from Cp and 2 variables from BIC.
+
+``` r
+regfit.sdata.fwd<-regsubsets(y~poly(x,10),data=SData,method="forward")
+sumregfit.sdata.fwd<-summary(regfit.sdata.fwd)
+sumregfit.sdata.fwd
+```
+
+    ## Subset selection object
+    ## Call: regsubsets.formula(y ~ poly(x, 10), data = SData, method = "forward")
+    ## 10 Variables  (and intercept)
+    ##               Forced in Forced out
+    ## poly(x, 10)1      FALSE      FALSE
+    ## poly(x, 10)2      FALSE      FALSE
+    ## poly(x, 10)3      FALSE      FALSE
+    ## poly(x, 10)4      FALSE      FALSE
+    ## poly(x, 10)5      FALSE      FALSE
+    ## poly(x, 10)6      FALSE      FALSE
+    ## poly(x, 10)7      FALSE      FALSE
+    ## poly(x, 10)8      FALSE      FALSE
+    ## poly(x, 10)9      FALSE      FALSE
+    ## poly(x, 10)10     FALSE      FALSE
+    ## 1 subsets of each size up to 8
+    ## Selection Algorithm: forward
+    ##          poly(x, 10)1 poly(x, 10)2 poly(x, 10)3 poly(x, 10)4 poly(x, 10)5
+    ## 1  ( 1 ) "*"          " "          " "          " "          " "         
+    ## 2  ( 1 ) "*"          "*"          " "          " "          " "         
+    ## 3  ( 1 ) "*"          "*"          "*"          " "          " "         
+    ## 4  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 5  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 6  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 7  ( 1 ) "*"          "*"          "*"          " "          "*"         
+    ## 8  ( 1 ) "*"          "*"          "*"          "*"          "*"         
+    ##          poly(x, 10)6 poly(x, 10)7 poly(x, 10)8 poly(x, 10)9 poly(x, 10)10
+    ## 1  ( 1 ) " "          " "          " "          " "          " "          
+    ## 2  ( 1 ) " "          " "          " "          " "          " "          
+    ## 3  ( 1 ) " "          " "          " "          " "          " "          
+    ## 4  ( 1 ) " "          " "          " "          " "          " "          
+    ## 5  ( 1 ) " "          " "          " "          "*"          " "          
+    ## 6  ( 1 ) "*"          " "          " "          "*"          " "          
+    ## 7  ( 1 ) "*"          " "          " "          "*"          "*"          
+    ## 8  ( 1 ) "*"          " "          " "          "*"          "*"
+
+``` r
+par(mfrow=c(2,2))
+plot(sumregfit.sdata.fwd$rss,xlab="Number of variables",ylab="Residual sum of squares",type="l")
+plot(sumregfit.sdata.fwd$adjr2,xlab="Number of variables",ylab="Adjusted R-squared",type="l")
+points(which.max(sumregfit.sdata.fwd$adjr2),sumregfit.sdata.fwd$adjr2[which.max(sumregfit.sdata.fwd$adjr2)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.fwd$cp,xlab="Number of variables",ylab="Cp",type="l")
+points(which.min(sumregfit.sdata.fwd$cp),sumregfit.sdata.fwd$cp[which.min(sumregfit.sdata.fwd$cp)],col = "red", cex = 2,pch = 20)
+plot(sumregfit.sdata.fwd$bic,xlab="Number of variables",ylab="BIC",type="l")
+points(which.min(sumregfit.sdata.fwd$bic),sumregfit.sdata.fwd$bic[which.min(sumregfit.sdata.fwd$bic)],col = "red", cex = 2,pch = 20)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+Forward selection leads to a 6 variable model for adjusted R-squared, a
+3 variable model for Cp and a 2 variable model for BIC.
+
+``` r
+library(glmnet)
+```
+
+    ## Loading required package: Matrix
+
+    ## Loaded glmnet 4.1-3
+
+``` r
+grid<-10^seq(10,-2,length=100)
+x.vars=matrix(rep(rep(0,100),10),nrow=100,ncol=10)
+for (i in 1:10)
+{x.vars[,i]=x^i}
+lasso.fit<-glmnet(x.vars,y,alpha=1,lambda=grid)
+par(mfrow=c(1,2))
+plot(coef(lasso.fit)[,],ylab="Coefficient estimates")
+plot(lasso.fit)
+```
+
+    ## Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
+    ## collapsing to unique 'x' values
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+
+``` r
+set.seed(1)
+train<-sample(1:length(x),length(x)/2)
+test<-(-train)
+y.test<-y[test]
+lasso.fit2<-glmnet(x.vars[train,],y[train],alpha=1,lambda=grid)
+cv.lasso.fit<-cv.glmnet(x.vars[train,],y[train],alpha=1,lambda=grid)
+plot(cv.lasso.fit)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+
+``` r
+bestlam<-cv.lasso.fit$lambda.min
+bestlam
+```
+
+    ## [1] 0.01
+
+``` r
+lasso.pred<-predict(lasso.fit2,s=bestlam,newx=x.vars[test,])
+mean (( lasso.pred - y.test)^2)
+```
+
+    ## [1] 0.007952033
+
 # Chapter 7: Moving Beyond Linearity
 
 # Chapter 8: Tree Based Methods

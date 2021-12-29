@@ -472,6 +472,70 @@ bestlam
 lasso.pred<-predict(lasso.fit2,s=bestlam,newx=x.vars[test,])
 mean (( lasso.pred - y.test)^2)
 ```
+## Question 9
+
+```{r}
+set.seed(1)
+train<-sample(1:777,666)
+test<-(-train)
+College.train<-College[train,]
+apps.lm<-lm(Apps~.,data=College,subset = train)
+apps.lm.pred<-predict(apps.lm,College[test,])
+mse.lm<-mean((College$Apps[test]-apps.lm.pred)^2)
+mse.lm
+```
+```{r}
+library(glmnet)
+x<-model.matrix(Apps~.,College)[,-1]
+y<-College$Apps
+grid<-10^seq(10,-2,length=100)
+apps.ridge<-glmnet(x[train,],y[train],alpha=0,lambda=grid)
+apps.ridge.cv<-cv.glmnet(x[train,],y[train], alpha=0,lambda=grid)
+plot(apps.ridge.cv)
+bestlam<-apps.ridge.cv$lambda.min
+apps.ridge.pred<-predict(apps.ridge,s=bestlam,newx=x[test,])
+mse.ridge<-mean((y[test]-apps.ridge.pred)^2)
+mse.ridge
+```
+
+
+```{r}
+apps.lasso<-glmnet(x[train,],y[train],alpha=1,lambda=grid)
+apps.lasso.cv<-cv.glmnet(x[train,],y[train], alpha=1,lambda=grid)
+plot(apps.lasso.cv)
+bestlam<-apps.lasso.cv$lambda.min
+apps.lasso.pred<-predict(apps.lasso,s=bestlam,newx=x[test,])
+mse.lasso<-mean((y[test]-apps.lasso.pred)^2)
+mse.lasso
+predict(apps.lasso , type = "coefficients",
+s = bestlam)
+```
+
+Cross-validation has chosen a low-value of lambda so the estimates are close to the least-squares ones. As such all of the variables have non-zero coefficients.
+
+```{r}
+library(pls)
+apps.pcr<-pcr(Apps~.,data=College,scale=TRUE,subest=train,validation="CV")
+validationplot(apps.pcr,val.type = "MSEP")
+apps.pcr.pred <- predict(apps.pcr , College[test,], ncomp = 5)
+mse.pcr<-mean (( apps.pcr.pred - College$Apps[test])^2)
+mse.pcr
+
+```
+
+We selected the model with 5 principal components.
+
+```{r}
+apps.pls<-plsr(Apps~.,data=College,scale=TRUE,subset=train,validation="CV")
+validationplot(apps.pls,val.type = "MSEP")
+apps.pls.pred <- predict(apps.pls , College[test,], ncomp = 5)
+mse.pls<-mean (( apps.pls.pred - College$Apps[test])^2)
+mse.pls
+```
+
+
+We selected the partial least squares model with 5 components.
+
 
 # Chapter 7: Moving Beyond Linearity
 

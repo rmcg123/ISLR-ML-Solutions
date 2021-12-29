@@ -1320,6 +1320,135 @@ mean (( lasso.pred - y.test)^2)
 
     ## [1] 0.007952033
 
+## Question 9
+
+``` r
+set.seed(1)
+train<-sample(1:777,666)
+test<-(-train)
+College.train<-College[train,]
+apps.lm<-lm(Apps~.,data=College,subset = train)
+apps.lm.pred<-predict(apps.lm,College[test,])
+mse.lm<-mean((College$Apps[test]-apps.lm.pred)^2)
+mse.lm
+```
+
+    ## [1] 1576016
+
+``` r
+library(glmnet)
+x<-model.matrix(Apps~.,College)[,-1]
+y<-College$Apps
+grid<-10^seq(10,-2,length=100)
+apps.ridge<-glmnet(x[train,],y[train],alpha=0,lambda=grid)
+apps.ridge.cv<-cv.glmnet(x[train,],y[train], alpha=0,lambda=grid)
+plot(apps.ridge.cv)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+
+``` r
+bestlam<-apps.ridge.cv$lambda.min
+apps.ridge.pred<-predict(apps.ridge,s=bestlam,newx=x[test,])
+mse.ridge<-mean((y[test]-apps.ridge.pred)^2)
+mse.ridge
+```
+
+    ## [1] 1575610
+
+``` r
+apps.lasso<-glmnet(x[train,],y[train],alpha=1,lambda=grid)
+apps.lasso.cv<-cv.glmnet(x[train,],y[train], alpha=1,lambda=grid)
+plot(apps.lasso.cv)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+
+``` r
+bestlam<-apps.lasso.cv$lambda.min
+apps.lasso.pred<-predict(apps.lasso,s=bestlam,newx=x[test,])
+mse.lasso<-mean((y[test]-apps.lasso.pred)^2)
+mse.lasso
+```
+
+    ## [1] 1574871
+
+``` r
+predict(apps.lasso , type = "coefficients",
+s = bestlam)
+```
+
+    ## 19 x 1 sparse Matrix of class "dgCMatrix"
+    ##                        s1
+    ## (Intercept) -5.798614e+02
+    ## PrivateYes  -3.887947e+02
+    ## Accept       1.652106e+00
+    ## Enroll      -1.083641e+00
+    ## Top10perc    4.314037e+01
+    ## Top25perc   -1.178371e+01
+    ## F.Undergrad  7.205360e-02
+    ## P.Undergrad  5.873815e-02
+    ## Outstate    -7.853565e-02
+    ## Room.Board   1.517184e-01
+    ## Books        1.562724e-01
+    ## Personal     6.613317e-03
+    ## PhD         -9.027669e+00
+    ## Terminal     1.489658e-01
+    ## S.F.Ratio    1.484456e+01
+    ## perc.alumni  1.351553e-01
+    ## Expend       5.794693e-02
+    ## Grad.Rate    6.545461e+00
+    ## EliteYes     3.017161e+02
+
+Cross-validation has chosen a low-value of lambda so the estimates are
+close to the least-squares ones. As such all of the variables have
+non-zero coefficients.
+
+``` r
+library(pls)
+```
+
+    ## 
+    ## Attaching package: 'pls'
+
+    ## The following object is masked from 'package:stats':
+    ## 
+    ##     loadings
+
+``` r
+apps.pcr<-pcr(Apps~.,data=College,scale=TRUE,subest=train,validation="CV")
+validationplot(apps.pcr,val.type = "MSEP")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+
+``` r
+apps.pcr.pred <- predict(apps.pcr , College[test,], ncomp = 5)
+mse.pcr<-mean (( apps.pcr.pred - College$Apps[test])^2)
+mse.pcr
+```
+
+    ## [1] 2319381
+
+We selected the model with 5 principal components.
+
+``` r
+apps.pls<-plsr(Apps~.,data=College,scale=TRUE,subset=train,validation="CV")
+validationplot(apps.pls,val.type = "MSEP")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+
+``` r
+apps.pls.pred <- predict(apps.pls , College[test,], ncomp = 5)
+mse.pls<-mean (( apps.pls.pred - College$Apps[test])^2)
+mse.pls
+```
+
+    ## [1] 1632095
+
+We selected the partial least squares model with 5 components.
+
 # Chapter 7: Moving Beyond Linearity
 
 # Chapter 8: Tree Based Methods

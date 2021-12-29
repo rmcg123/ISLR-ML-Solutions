@@ -1451,6 +1451,42 @@ We selected the partial least squares model with 5 components.
 
 # Chapter 7: Moving Beyond Linearity
 
+## Question 6
+
+``` r
+set.seed(4)
+cv.error<-rep(0,10)
+for (i in 1:10)
+{glm.fit<-glm(wage~poly(age,i),data=Wage)
+cv.error[i]<-cv.glm(Wage,glm.fit,K=10)$delta[1]}
+plot(cv.error)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+
+``` r
+model<-glm(wage~poly(age,3),data=Wage)
+ages<-seq(0,80,1)
+plot(ages,coef(model)[1]+coef(model)[2]*ages++coef(model)[3]*ages^2+coef(model)[4]*ages^3,ylab="Wage")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-40-2.png)<!-- -->
+
+A degree 3 polynomial was chosen which is consistent with the 3/4
+variable choice from the ANOVA approach.
+
+``` r
+cv.error.cut <- rep (0,12)
+for (i in 2:13){
+  Wage$tmp <- cut(Wage$age,i)
+  step.fit = glm(wage~tmp, data = Wage)
+  cv.error.cut[i] <- cv.glm(Wage ,step.fit, K= 10)$delta [1]
+}
+plot(cv.error.cut)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
+
 # Chapter 8: Tree Based Methods
 
 # Chapter 9: Support Vector Machines

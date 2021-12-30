@@ -1486,8 +1486,283 @@ plot(cv.error.cut)
 ```
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
+\#\# Question 7
 
-# Chapter 8: Tree Based Methods
+``` r
+par(mfrow=c(2,3))
+plot(Wage$maritl,Wage$wage,xlab="Marital Status",ylab="Wage")
+plot(Wage$race,Wage$wage,xlab="Race",ylab="Wage")
+plot(Wage$jobclass,Wage$wage,xlab="Job Class",ylab="Wage")
+plot(Wage$health,Wage$wage,xlab="Health Status",ylab="Wage")
+plot(Wage$health_ins,Wage$wage,xlab="Health Insurance",ylab="Wage")
+plot(Wage$region,Wage$wage,xlab="Region",ylab="Wage")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
+There is potential evidence for health status, marital status, race and
+whether the individual has health insurance being relevant to Wage.
+
+``` r
+library(splines)
+polyfits1<-lm(wage~race+health_ins+health+maritl,data=Wage)
+summary(polyfits1)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = wage ~ race + health_ins + health + maritl, data = Wage)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -96.786 -23.043  -5.508  15.187 223.242 
+    ## 
+    ## Coefficients:
+    ##                      Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)            95.317      2.022  47.151  < 2e-16 ***
+    ## race2. Black           -6.420      2.365  -2.715  0.00667 ** 
+    ## race3. Asian            7.482      2.869   2.608  0.00916 ** 
+    ## race4. Other          -14.101      6.310  -2.235  0.02550 *  
+    ## health_ins2. No       -25.170      1.520 -16.561  < 2e-16 ***
+    ## health2. >=Very Good   11.232      1.545   7.270 4.56e-13 ***
+    ## maritl2. Married       22.603      1.727  13.086  < 2e-16 ***
+    ## maritl3. Widowed        5.057      8.856   0.571  0.56804    
+    ## maritl4. Divorced       8.362      3.069   2.725  0.00647 ** 
+    ## maritl5. Separated      8.760      5.344   1.639  0.10129    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 38.01 on 2990 degrees of freedom
+    ## Multiple R-squared:  0.1726, Adjusted R-squared:  0.1701 
+    ## F-statistic: 69.32 on 9 and 2990 DF,  p-value: < 2.2e-16
+
+## Question 9
+
+``` r
+cub.fit<-lm(nox~poly(dis,3),data=Boston)
+summary(cub.fit)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = nox ~ poly(dis, 3), data = Boston)
+    ## 
+    ## Residuals:
+    ##       Min        1Q    Median        3Q       Max 
+    ## -0.121130 -0.040619 -0.009738  0.023385  0.194904 
+    ## 
+    ## Coefficients:
+    ##                Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)    0.554695   0.002759 201.021  < 2e-16 ***
+    ## poly(dis, 3)1 -2.003096   0.062071 -32.271  < 2e-16 ***
+    ## poly(dis, 3)2  0.856330   0.062071  13.796  < 2e-16 ***
+    ## poly(dis, 3)3 -0.318049   0.062071  -5.124 4.27e-07 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.06207 on 502 degrees of freedom
+    ## Multiple R-squared:  0.7148, Adjusted R-squared:  0.7131 
+    ## F-statistic: 419.3 on 3 and 502 DF,  p-value: < 2.2e-16
+
+``` r
+plot(Boston$dis,Boston$nox,ylab="NOx, pp10m",xlab="Distance to employment centre")
+pred <- predict(cub.fit)
+dissort <- sort(Boston$dis, index.return=T)$ix
+lines(Boston$dis[dissort],pred[dissort],col="red",type="l")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+
+``` r
+poly.rss<-rep(0,10)
+for (i in 1:10)
+{poly.fits<-lm(nox~poly(dis,i),data=Boston)
+poly.rss[i]<-sum(poly.fits$residuals^2)}
+poly.rss
+```
+
+    ##  [1] 2.768563 2.035262 1.934107 1.932981 1.915290 1.878257 1.849484 1.835630
+    ##  [9] 1.833331 1.832171
+
+``` r
+poly.cv<-rep(0,10)
+for (i in 1:10)
+{poly.fits<-glm(nox~poly(dis,i),data=Boston)
+cv.poly.fits<-cv.glm(Boston,poly.fits,K=10)
+poly.cv[i]<-cv.poly.fits$delta[1]}
+plot(poly.cv)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-44-2.png)<!-- -->
+Cross-validation seems to support a model using up to cubic or quartic
+terms.
+
+``` r
+dislims<-range(Boston$dis)
+dis.grid<-seq(from=dislims[1],to=dislims[2])
+spline.fit<-lm(nox~bs(dis,knots=median(dis)),data=Boston)
+spline.pred <- predict(spline.fit , newdata = list(dis=dis.grid), se = T)
+se.bands <- cbind(spline.pred$fit + 2 * spline.pred$se.fit ,
+spline.pred$fit - 2 * spline.pred$se.fit)
+plot(Boston$dis,Boston$nox)
+lines(dis.grid,spline.pred$fit)
+matlines(dis.grid , se.bands, lwd = 1, col = "blue", lty = 3)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+
+``` r
+bs.rss<-rep(0,10)
+for (i in 1:10)
+{bs.fits<-lm(nox~bs(dis,df=4+i),data=Boston)
+bs.rss[i]<-sum(bs.fits$residuals^2)}
+bs.rss
+```
+
+    ##  [1] 1.840173 1.833966 1.829884 1.816995 1.825653 1.792535 1.796992 1.788999
+    ##  [9] 1.782350 1.781838
+
+``` r
+set.seed(10)
+bs.cv<-rep(0,10)
+for (i in 1:10)
+{bs.fits<-glm(nox~bs(dis,df=4+i),data=Boston)
+bs.fits.cv<-cv.glm(Boston,bs.fits,K=10)
+bs.cv[i]<-bs.fits.cv$delta[1]}
+```
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`33.33333%` = 2.32486666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`33.33333%` = 2.32486666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`33.33333%` = 2.40296666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`33.33333%` = 2.40296666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`25%` = 2.10215, `50%` = 3.3175, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`25%` = 2.10215, `50%` = 3.3175, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`25%` = 2.09445, `50%` = 3.2157, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`25%` = 2.09445, `50%` = 3.2157, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`20%` = 1.9709, `40%` = 2.5975, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`20%` = 1.9709, `40%` = 2.5975, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`20%` = 1.9669, `40%` = 2.5975, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`20%` = 1.9669, `40%` = 2.5975, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`16.66667%` = 1.8208, `33.33333%` =
+    ## 2.354, : some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`16.66667%` = 1.8208, `33.33333%` =
+    ## 2.354, : some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`16.66667%` = 1.86636666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`16.66667%` = 1.86636666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`14.28571%` = 1.7936, `28.57143%`
+    ## = 2.19385714285714, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`14.28571%` = 1.7936, `28.57143%`
+    ## = 2.19385714285714, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`14.28571%` = 1.76467142857143, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`14.28571%` = 1.76467142857143, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`12.5%` = 1.7278, `25%` = 2.0771, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`12.5%` = 1.7278, `25%` = 2.0771, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`12.5%` = 1.748425, `25%` = 2.09445, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`12.5%` = 1.748425, `25%` = 2.09445, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`11.11111%` = 1.74766666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`11.11111%` = 1.74766666666667, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`11.11111%` = 1.65225555555556, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`11.11111%` = 1.65225555555556, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`10%` = 1.62008, `20%` = 1.94984, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`10%` = 1.62008, `20%` = 1.94984, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`10%` = 1.64325, `20%` = 1.9444, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`10%` = 1.64325, `20%` = 1.9444, :
+    ## some 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`9.090909%` = 1.61066363636364, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`9.090909%` = 1.61066363636364, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`9.090909%` = 1.59734545454545, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`9.090909%` = 1.59734545454545, : some
+    ## 'x' values beyond boundary knots may cause ill-conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`8.333333%` = 1.5893, `16.66667%`
+    ## = 1.85586666666667, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`8.333333%` = 1.5893, `16.66667%`
+    ## = 1.85586666666667, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`8.333333%` = 1.57935, `16.66667%`
+    ## = 1.84476666666667, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+    ## Warning in bs(dis, degree = 3L, knots = c(`8.333333%` = 1.57935, `16.66667%`
+    ## = 1.84476666666667, : some 'x' values beyond boundary knots may cause ill-
+    ## conditioned bases
+
+``` r
+plot(5:14,bs.cv)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-45-2.png)<!-- -->
+The regression splines approach supports a model with 3+5=8 degrees of
+freedom equivalent \# Chapter 8: Tree Based Methods
 
 # Chapter 9: Support Vector Machines
 

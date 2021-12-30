@@ -564,6 +564,75 @@ for (i in 2:13){
 }
 plot(cv.error.cut)
 ```
+## Question 7 
+
+```{r}
+par(mfrow=c(2,3))
+plot(Wage$maritl,Wage$wage,xlab="Marital Status",ylab="Wage")
+plot(Wage$race,Wage$wage,xlab="Race",ylab="Wage")
+plot(Wage$jobclass,Wage$wage,xlab="Job Class",ylab="Wage")
+plot(Wage$health,Wage$wage,xlab="Health Status",ylab="Wage")
+plot(Wage$health_ins,Wage$wage,xlab="Health Insurance",ylab="Wage")
+plot(Wage$region,Wage$wage,xlab="Region",ylab="Wage")
+
+```
+There is potential evidence for health status, marital status, race and whether the individual has health insurance being relevant to Wage.
+
+```{r}
+library(splines)
+polyfits1<-lm(wage~race+health_ins+health+maritl,data=Wage)
+summary(polyfits1)
+```
+
+
+## Question 9
+
+```{r}
+cub.fit<-lm(nox~poly(dis,3),data=Boston)
+summary(cub.fit)
+plot(Boston$dis,Boston$nox,ylab="NOx, pp10m",xlab="Distance to employment centre")
+pred <- predict(cub.fit)
+dissort <- sort(Boston$dis, index.return=T)$ix
+lines(Boston$dis[dissort],pred[dissort],col="red",type="l")
+poly.rss<-rep(0,10)
+for (i in 1:10)
+{poly.fits<-lm(nox~poly(dis,i),data=Boston)
+poly.rss[i]<-sum(poly.fits$residuals^2)}
+poly.rss
+poly.cv<-rep(0,10)
+for (i in 1:10)
+{poly.fits<-glm(nox~poly(dis,i),data=Boston)
+cv.poly.fits<-cv.glm(Boston,poly.fits,K=10)
+poly.cv[i]<-cv.poly.fits$delta[1]}
+plot(poly.cv)
+```
+Cross-validation seems to support a model using up to cubic or quartic terms.
+
+```{r}
+dislims<-range(Boston$dis)
+dis.grid<-seq(from=dislims[1],to=dislims[2])
+spline.fit<-lm(nox~bs(dis,knots=median(dis)),data=Boston)
+spline.pred <- predict(spline.fit , newdata = list(dis=dis.grid), se = T)
+se.bands <- cbind(spline.pred$fit + 2 * spline.pred$se.fit ,
+spline.pred$fit - 2 * spline.pred$se.fit)
+plot(Boston$dis,Boston$nox)
+lines(dis.grid,spline.pred$fit)
+matlines(dis.grid , se.bands, lwd = 1, col = "blue", lty = 3)
+bs.rss<-rep(0,10)
+for (i in 1:10)
+{bs.fits<-lm(nox~bs(dis,df=4+i),data=Boston)
+bs.rss[i]<-sum(bs.fits$residuals^2)}
+bs.rss
+set.seed(10)
+bs.cv<-rep(0,10)
+for (i in 1:10)
+{bs.fits<-glm(nox~bs(dis,df=4+i),data=Boston)
+bs.fits.cv<-cv.glm(Boston,bs.fits,K=10)
+bs.cv[i]<-bs.fits.cv$delta[1]}
+plot(5:14,bs.cv)
+```
+The regression splines approach supports a model with 4+2=6 degrees of freedom equivalent.
+
 
 # Chapter 8: Tree Based Methods
 

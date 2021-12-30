@@ -1761,8 +1761,64 @@ plot(5:14,bs.cv)
 ```
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-45-2.png)<!-- -->
-The regression splines approach supports a model with 3+5=8 degrees of
-freedom equivalent \# Chapter 8: Tree Based Methods
+The regression splines approach supports a model with 4+2=6 degrees of
+freedom equivalent.
+
+# Chapter 8: Tree Based Methods
+
+``` r
+library(tree)
+library(randomForest)
+```
+
+    ## randomForest 4.6-14
+
+    ## Type rfNews() to see new features/changes/bug fixes.
+
+``` r
+library(gbm)
+```
+
+    ## Loaded gbm 2.1.8
+
+``` r
+library(BART)
+```
+
+    ## Loading required package: nlme
+
+    ## Loading required package: nnet
+
+    ## Loading required package: survival
+
+    ## 
+    ## Attaching package: 'survival'
+
+    ## The following object is masked from 'package:boot':
+    ## 
+    ##     aml
+
+``` r
+set.seed(1)
+train<-sample(1:nrow(Boston),nrow(Boston)/2)
+test<-(-train)
+medv.test<-Boston$medv[test]
+error.bag<-matrix(rep(0,40),nrow=5,ncol=8)
+jay<-c(3,4,6,8,12)
+for (j in 1:5)
+{for (i in 1:8)
+{tree.bag<-randomForest(medv~.,data=Boston,subset=train,mtry=jay[j],ntrees=40*i)
+predict.bag<-predict(tree.bag,newdata=Boston[test,])
+error.bag[j,i]<-mean((medv.test-predict.bag)^2)}}
+plot(seq(40,320,40),error.bag[1,],type="b",col=2, xlab="Number of trees",ylab="Mean test error",ylim=c(17,26))
+lines(seq(40,320,40),error.bag[2,],type="b",col=3)
+lines(seq(40,320,40),error.bag[3,],type="b",col=4)
+lines(seq(40,320,40),error.bag[4,],type="b",col=5)
+lines(seq(40,320,40),error.bag[5,],type="b",col=6)
+legend(x="topright",legend=c("p=3","p=4","p=6","p=8","p=12"),fill=2:6)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 # Chapter 9: Support Vector Machines
 

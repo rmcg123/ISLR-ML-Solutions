@@ -1820,6 +1820,157 @@ legend(x="topright",legend=c("p=3","p=4","p=6","p=8","p=12"),fill=2:6)
 
 ![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
+``` r
+train<-sample(1:nrow(Carseats),nrow(Carseats)/2)
+test<-(-train)
+tree.cars<-tree(Sales~.,data=Carseats,subset=train)
+plot(tree.cars)
+text(tree.cars,pretty=0)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
+
+``` r
+tree.pred<-predict(tree.cars,newdata=Carseats[test,])
+MSE<- mean((tree.pred-Carseats$Sales[test])^2)
+MSE
+```
+
+    ## [1] 6.71382
+
+``` r
+set.seed (7)
+cv.cars <- cv.tree(tree.cars)
+plot(cv.cars$size,cv.cars$dev,type="b")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-47-2.png)<!-- -->
+
+``` r
+prune.tree.cars<-prune.tree(tree.cars,best=14)
+plot(prune.tree.cars)
+text(tree.cars,pretty=0)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-47-3.png)<!-- -->
+
+``` r
+prune.pred<-predict(prune.tree.cars,newdata=Carseats[test,])
+pruneMSE<-mean((prune.pred-Carseats$Sales[test])^2)
+pruneMSE
+```
+
+    ## [1] 6.83461
+
+The test MSE has improved after puning.
+
+``` r
+carseats.bag<-randomForest(Sales~.,data=Carseats,subset=train,mtry=10,ntrees=200)
+bag.pred<-predict(carseats.bag,newdat=Carseats[test,])
+bag.MSE<-mean((Carseats$Sales[test]-bag.pred)^2)
+bag.MSE
+```
+
+    ## [1] 3.420791
+
+``` r
+importance(carseats.bag)
+```
+
+    ##             IncNodePurity
+    ## CompPrice      133.646154
+    ## Income         121.137159
+    ## Advertising    113.733270
+    ## Population      58.081735
+    ## Price          413.758959
+    ## ShelveLoc      561.541644
+    ## Age            159.248094
+    ## Education       35.156421
+    ## Urban           10.420532
+    ## US               5.650582
+
+``` r
+rf=c(3,4,5,6,8)
+rf.mse<-rep(0,5)
+rf.imp<-rep(0,5)
+for (i in 1:5)
+{carseats.bag<-randomForest(Sales~.,data=Carseats,subset=train,mtry=rf[i],ntrees=200)
+bag.pred<-predict(carseats.bag,newdat=Carseats[test,])
+rf.mse[i]<-mean((Carseats$Sales[test]-bag.pred)^2)}
+rf.mse
+```
+
+    ## [1] 3.192982 3.154478 2.991543 3.115854 3.335379
+
+``` r
+importance(carseats.bag)
+```
+
+    ##             IncNodePurity
+    ## CompPrice       134.96261
+    ## Income          128.17053
+    ## Advertising     117.16751
+    ## Population       62.01756
+    ## Price           409.99100
+    ## ShelveLoc       555.91460
+    ## Age             158.58002
+    ## Education        39.07113
+    ## Urban            11.99109
+    ## US                6.25472
+
+The approaches closest to bagging perform the best with the lowest test
+MSE.
+
+``` r
+x<-Carseats[,2:11]
+y<-Carseats[,1]
+xtrain<-x[train,]
+ytrain<-y[train]
+xtest<-x[test,]
+ytest<-y[test]
+set.seed (1)
+bartfit <- gbart(xtrain , ytrain , x.test = xtest)
+```
+
+    ## *****Calling gbart: type=1
+    ## *****Data:
+    ## data:n,p,np: 200, 14, 200
+    ## y1,yn: 3.895950, 3.955950
+    ## x1,x[n*p]: 104.000000, 1.000000
+    ## xp1,xp[np*p]: 111.000000, 1.000000
+    ## *****Number of Trees: 200
+    ## *****Number of Cut Points: 61 ... 1
+    ## *****burn,nd,thin: 100,1000,1
+    ## *****Prior:beta,alpha,tau,nu,lambda,offset: 2,0.95,0.276302,3,0.167686,7.58405
+    ## *****sigma: 0.927819
+    ## *****w (weights): 1.000000 ... 1.000000
+    ## *****Dirichlet:sparse,theta,omega,a,b,rho,augment: 0,0,1,0.5,1,14,0
+    ## *****printevery: 100
+    ## 
+    ## MCMC
+    ## done 0 (out of 1100)
+    ## done 100 (out of 1100)
+    ## done 200 (out of 1100)
+    ## done 300 (out of 1100)
+    ## done 400 (out of 1100)
+    ## done 500 (out of 1100)
+    ## done 600 (out of 1100)
+    ## done 700 (out of 1100)
+    ## done 800 (out of 1100)
+    ## done 900 (out of 1100)
+    ## done 1000 (out of 1100)
+    ## time: 8s
+    ## trcnt,tecnt: 1000,1000
+
+``` r
+yhat.bart <- bartfit$yhat.test.mean
+mean (( ytest - yhat.bart)^2)
+```
+
+    ## [1] 1.792869
+
+The BART MSE is significantly lower than any of the other approaches.
+
 # Chapter 9: Support Vector Machines
 
 # Chapter 10: Deep Learning

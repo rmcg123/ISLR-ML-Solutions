@@ -661,6 +661,62 @@ legend(x="topright",legend=c("p=3","p=4","p=6","p=8","p=12"),fill=2:6)
 ```
 
 
+```{r}
+train<-sample(1:nrow(Carseats),nrow(Carseats)/2)
+test<-(-train)
+tree.cars<-tree(Sales~.,data=Carseats,subset=train)
+plot(tree.cars)
+text(tree.cars,pretty=0)
+tree.pred<-predict(tree.cars,newdata=Carseats[test,])
+MSE<- mean((tree.pred-Carseats$Sales[test])^2)
+MSE
+set.seed (7)
+cv.cars <- cv.tree(tree.cars)
+plot(cv.cars$size,cv.cars$dev,type="b")
+prune.tree.cars<-prune.tree(tree.cars,best=14)
+plot(prune.tree.cars)
+text(tree.cars,pretty=0)
+prune.pred<-predict(prune.tree.cars,newdata=Carseats[test,])
+pruneMSE<-mean((prune.pred-Carseats$Sales[test])^2)
+pruneMSE
+```
+The test MSE has improved after puning.
+
+```{r}
+carseats.bag<-randomForest(Sales~.,data=Carseats,subset=train,mtry=10,ntrees=200)
+bag.pred<-predict(carseats.bag,newdat=Carseats[test,])
+bag.MSE<-mean((Carseats$Sales[test]-bag.pred)^2)
+bag.MSE
+importance(carseats.bag)
+```
+```{r}
+rf=c(3,4,5,6,8)
+rf.mse<-rep(0,5)
+rf.imp<-rep(0,5)
+for (i in 1:5)
+{carseats.bag<-randomForest(Sales~.,data=Carseats,subset=train,mtry=rf[i],ntrees=200)
+bag.pred<-predict(carseats.bag,newdat=Carseats[test,])
+rf.mse[i]<-mean((Carseats$Sales[test]-bag.pred)^2)}
+rf.mse
+importance(carseats.bag)
+```
+The approaches closest to bagging perform the best with the lowest test MSE.
+
+```{r}
+x<-Carseats[,2:11]
+y<-Carseats[,1]
+xtrain<-x[train,]
+ytrain<-y[train]
+xtest<-x[test,]
+ytest<-y[test]
+set.seed (1)
+bartfit <- gbart(xtrain , ytrain , x.test = xtest)
+yhat.bart <- bartfit$yhat.test.mean
+mean (( ytest - yhat.bart)^2)
+```
+The BART MSE is significantly lower than any of the other approaches.
+
+
 # Chapter 9: Support Vector Machines
 
 # Chapter 10: Deep Learning

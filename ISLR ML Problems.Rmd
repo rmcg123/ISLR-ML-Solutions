@@ -717,6 +717,30 @@ mean (( ytest - yhat.bart)^2)
 The BART MSE is significantly lower than any of the other approaches.
 
 
+##Question 10
+
+```{r}
+Hitters<-na.omit(Hitters)
+Logsal<-log10(Hitters$Salary)
+Hitters2<-data.frame(Hitters,Logsal)
+set.seed(6)
+train<-sample(1:nrow(Hitters2),200)
+test<-(-train)
+shrink<-10^seq(-3,-1,length=10)
+trainMSE<-rep(0,10)
+testMSE<-rep(0,10)
+for (i in 1:10)
+{boost.hit<-gbm(Logsal~.-Salary,data=Hitters2[train,],n.trees=1000,distribution="gaussian",interaction.depth = 3,shrinkage = shrink[i])
+trainMSE[i]<-boost.hit$train.error[1000]
+yhat.boost <- predict(boost.hit ,
+newdata = Hitters2[-train , ], n.trees = 1000)
+testMSE[i]=mean((yhat.boost-Hitters2$Logsal)^2)}
+plot(shrink,trainMSE,col=1,type="b")
+plot(shrink,testMSE,col=2,type="b")
+summary(boost.hit)
+```
+
+
 # Chapter 9: Support Vector Machines
 
 # Chapter 10: Deep Learning

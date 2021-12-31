@@ -1959,7 +1959,7 @@ bartfit <- gbart(xtrain , ytrain , x.test = xtest)
     ## done 800 (out of 1100)
     ## done 900 (out of 1100)
     ## done 1000 (out of 1100)
-    ## time: 8s
+    ## time: 9s
     ## trcnt,tecnt: 1000,1000
 
 ``` r
@@ -1970,6 +1970,95 @@ mean (( ytest - yhat.bart)^2)
     ## [1] 1.792869
 
 The BART MSE is significantly lower than any of the other approaches.
+
+\#\#Question 10
+
+``` r
+Hitters<-na.omit(Hitters)
+Logsal<-log10(Hitters$Salary)
+Hitters2<-data.frame(Hitters,Logsal)
+set.seed(6)
+train<-sample(1:nrow(Hitters2),200)
+test<-(-train)
+shrink<-10^seq(-3,-1,length=10)
+trainMSE<-rep(0,10)
+testMSE<-rep(0,10)
+for (i in 1:10)
+{boost.hit<-gbm(Logsal~.-Salary,data=Hitters2[train,],n.trees=1000,distribution="gaussian",interaction.depth = 3,shrinkage = shrink[i])
+trainMSE[i]<-boost.hit$train.error[1000]
+yhat.boost <- predict(boost.hit ,
+newdata = Hitters2[-train , ], n.trees = 1000)
+testMSE[i]=mean((yhat.boost-Hitters2$Logsal)^2)}
+```
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+    ## Warning in yhat.boost - Hitters2$Logsal: longer object length is not a multiple
+    ## of shorter object length
+
+``` r
+plot(shrink,trainMSE,col=1,type="b")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+
+``` r
+plot(shrink,testMSE,col=2,type="b")
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-51-2.png)<!-- -->
+
+``` r
+summary(boost.hit)
+```
+
+![](ISLR-ML-Problems_files/figure-gfm/unnamed-chunk-51-3.png)<!-- -->
+
+    ##                 var    rel.inf
+    ## CAtBat       CAtBat 20.4759928
+    ## CRuns         CRuns  9.2218717
+    ## CRBI           CRBI  8.4575286
+    ## Walks         Walks  8.0505881
+    ## CWalks       CWalks  7.5439763
+    ## PutOuts     PutOuts  6.0084521
+    ## HmRun         HmRun  5.6067961
+    ## CHmRun       CHmRun  4.9680662
+    ## RBI             RBI  4.8880469
+    ## Hits           Hits  3.7689581
+    ## Assists     Assists  3.6709054
+    ## CHits         CHits  3.6644251
+    ## Runs           Runs  3.5490740
+    ## Years         Years  3.2345321
+    ## Errors       Errors  2.7458657
+    ## AtBat         AtBat  2.6123688
+    ## League       League  0.6351817
+    ## Division   Division  0.4754083
+    ## NewLeague NewLeague  0.4219621
 
 # Chapter 9: Support Vector Machines
 
